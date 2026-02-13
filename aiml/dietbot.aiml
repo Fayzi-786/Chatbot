@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <aiml version="1.0.1">
 
-  <!-- ====== Greeting / Help ====== -->
+  <!-- Greeting -->
   <category>
     <pattern>HELLO</pattern>
     <template>Hi! I’m DietBot. Tell me your goal: lose weight, gain muscle, or maintain.</template>
@@ -12,6 +12,7 @@
     <template>Hello! What’s your fitness goal today: lose weight, gain muscle, or maintain?</template>
   </category>
 
+  <!-- Help -->
   <category>
     <pattern>HELP</pattern>
     <template>
@@ -21,7 +22,7 @@
     </template>
   </category>
 
-  <!-- ====== Goals ====== -->
+  <!-- Goals -->
   <category>
     <pattern>I WANT TO LOSE WEIGHT</pattern>
     <template>For weight loss: aim for a calorie deficit, high protein, high fiber, and daily activity. Want a sample day plan?</template>
@@ -29,7 +30,7 @@
 
   <category>
     <pattern>HOW DO I LOSE WEIGHT</pattern>
-    <template>Use a calorie deficit + strength training + steps/cardio. Consistency matters most. Tell me your age, height, weight, and activity level.</template>
+    <template>Use a calorie deficit, strength training, and daily steps/cardio. Tell me your age, height, weight, and activity level.</template>
   </category>
 
   <category>
@@ -47,38 +48,49 @@
     <template>To maintain: eat around maintenance calories and keep protein consistent. Want a simple maintenance meal plan?</template>
   </category>
 
-  <!-- ====== Food guidance ====== -->
+  <!-- Food guidance -->
   <category>
     <pattern>HIGH PROTEIN FOODS</pattern>
     <template>High-protein foods: chicken, eggs, tuna, Greek yogurt, lentils, tofu. Do you prefer vegetarian or non-veg?</template>
   </category>
 
   <category>
+    <pattern>HIGH PROTEIN FOOD</pattern>
+    <template>High-protein foods: chicken, eggs, tuna, Greek yogurt, lentils, tofu. Do you prefer vegetarian or non-veg?</template>
+  </category>
+
+  <!-- Common typo -->
+  <category>
+    <pattern>HIGH PROTINE FOODS</pattern>
+    <template>High-protein foods: chicken, eggs, tuna, Greek yogurt, lentils, tofu. Do you prefer vegetarian or non-veg?</template>
+  </category>
+
+  <category>
     <pattern>HEALTHY SNACKS</pattern>
-    <template>Healthy snacks: fruit, Greek yogurt, boiled eggs, nuts (small portion), hummus + carrots. Any allergies?</template>
+    <template>Healthy snacks: fruit, Greek yogurt, boiled eggs, nuts (small portion), hummus and carrots. Any allergies?</template>
   </category>
 
   <category>
     <pattern>WHAT SHOULD I EAT BEFORE WORKOUT</pattern>
-    <template>Pre-workout: carbs + a little protein (banana + yogurt, oats, rice + chicken). How long before training: 30 min or 2 hours?</template>
+    <template>Pre-workout: carbs plus a little protein (banana and yogurt, oats, rice and chicken). How long before training: 30 min or 2 hours?</template>
   </category>
 
   <category>
     <pattern>WHAT SHOULD I EAT AFTER WORKOUT</pattern>
-    <template>Post-workout: protein + carbs (chicken + rice, tuna sandwich, whey + banana). Are you training for muscle gain or fat loss?</template>
+    <template>Post-workout: protein plus carbs (chicken and rice, tuna sandwich, whey and banana). Are you training for muscle gain or fat loss?</template>
   </category>
 
   <category>
     <pattern>WHAT IS A CALORIE DEFICIT</pattern>
-    <template>Calorie deficit = you eat fewer calories than you burn. That’s how fat loss happens. Want a quick method to estimate maintenance calories?</template>
+    <template>Calorie deficit means you eat fewer calories than you burn. Want a quick way to estimate maintenance calories?</template>
   </category>
 
   <category>
     <pattern>HOW MUCH WATER SHOULD I DRINK</pattern>
-    <template>A simple target is 2–3 litres/day, more if you sweat a lot. Tell me your body weight for a better estimate.</template>
+    <template>A simple target is 2 to 3 litres per day, more if you sweat a lot. Tell me your body weight for a better estimate.</template>
   </category>
 
-  <!-- ====== Exit ====== -->
+  <!-- Exit -->
   <category>
     <pattern>BYE</pattern>
     <template>#0$Bye! Keep training strong 💪</template>
@@ -89,7 +101,17 @@
     <template>#0$Goodbye! Stay consistent 💪</template>
   </category>
 
-  <!-- ====== Fall back: trigger similarity search in Python ====== -->
+  <category>
+    <pattern>EXIT</pattern>
+    <template>#0$Bye! Keep training strong 💪</template>
+  </category>
+
+  <category>
+    <pattern>QUIT</pattern>
+    <template>#0$Bye! Keep training strong 💪</template>
+  </category>
+
+  <!-- Fallback: trigger similarity search in Python -->
   <category>
     <pattern>*</pattern>
     <template>#SIM$</template>
