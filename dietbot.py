@@ -148,7 +148,7 @@ def main():
 
             # Similarity trigger from AIML fallback
             if cmd == "SIM":
-                best_ans, score, matched_q = sim_qa.answer(user_input, threshold=0.25)
+                best_ans, score, matched_q = sim_qa.answer(user_input, threshold=0.35)
                 if best_ans:
                     print(best_ans)
                 else:
