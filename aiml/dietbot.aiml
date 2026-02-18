@@ -3,19 +3,21 @@
 
   <category>
     <pattern>HELLO</pattern>
-    <template>Hi! I am DietBot. Tell me your goal: lose weight, gain muscle, or maintain.</template>
+    <template>Hi! I am DietBot. Tell me a goal: lose weight, gain muscle, or maintain.</template>
   </category>
 
   <category>
     <pattern>HI</pattern>
-    <template>Hello! What is your fitness goal: lose weight, gain muscle, or maintain?</template>
+    <template>Hello! What is the goal today: lose weight, gain muscle, or maintain?</template>
   </category>
 
   <category>
     <pattern>HELP</pattern>
     <template>
-      I can help with diet advice for gym goals, high protein foods, and pre or post workout meals.
-      Logic: I know that Chicken is high_protein. Check that Oats is good_for_weight_loss.
+      I can help with diet advice, high protein foods, and pre or post workout meals.
+      Logic examples:
+      I know that Chicken is high_protein
+      Check that Oats is good_for_weight_loss
     </template>
   </category>
 
@@ -35,7 +37,17 @@
   </category>
 
   <category>
+    <pattern>PRE WORKOUT</pattern>
+    <template>Pre workout: carbs plus a little protein, like banana and yogurt, oats, or rice and chicken.</template>
+  </category>
+
+  <category>
     <pattern>WHAT SHOULD I EAT AFTER WORKOUT</pattern>
+    <template>Post workout: protein plus carbs, like chicken and rice, tuna sandwich, or whey and banana.</template>
+  </category>
+
+  <category>
+    <pattern>POST WORKOUT</pattern>
     <template>Post workout: protein plus carbs, like chicken and rice, tuna sandwich, or whey and banana.</template>
   </category>
 
@@ -44,7 +56,7 @@
     <template>Healthy snacks: fruit, Greek yogurt, boiled eggs, hummus with carrots.</template>
   </category>
 
-  <!-- Task B patterns required -->
+  <!-- Task B patterns From Lab Sheet -->
   <category>
     <pattern>I KNOW THAT * IS *</pattern>
     <template>#KBADD$<star/>$<star index="2"/></template>
@@ -70,7 +82,6 @@
     <template>#0$Bye! Keep training strong.</template>
   </category>
 
-  <!-- Fallback for similarity -->
   <category>
     <pattern>*</pattern>
     <template>#SIM$</template>

@@ -1,13 +1,11 @@
 ﻿#!/usr/bin/env python3
 import os
+import re
 import aiml
 import wikipedia
 import pandas as pd
 import numpy as np
 import nltk
-import contextlib
-import io
-
 
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
@@ -25,14 +23,11 @@ def ensure_nltk():
         ("wordnet", "corpora/wordnet"),
         ("omw-1.4", "corpora/omw-1.4"),
     ]
-
-    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-        for pkg, path in packages:
-            try:
-                nltk.data.find(path)
-            except LookupError:
-                nltk.download(pkg, quiet=True)
-
+    for pkg, path in packages:
+        try:
+            nltk.data.find(path)
+        except LookupError:
+            nltk.download(pkg, quiet=True)
 
 
 lemmatizer = WordNetLemmatizer()
@@ -45,6 +40,29 @@ def normalise_for_similarity(text: str) -> str:
     tokens = [t for t in tokens if t.isalpha()]
     lemmas = [lemmatizer.lemmatize(t) for t in tokens]
     return " ".join(lemmas)
+
+
+def clean_entity(text: str) -> str:
+    text = text.strip()
+    text = re.sub(r"\s+", "", text)      # remove spaces for better output
+    text = text.replace("_", "")         # remove underscores for better output
+    if not text:
+        return text
+    return text[0].upper() + text[1:].lower()
+
+
+def clean_property(text: str) -> str:
+    text = text.strip().lower()
+    text = re.sub(r"\s+", "_", text)
+    text = re.sub(r"_+", "_", text)      # collapse multiple underscores
+    text = text.replace("-", " ")
+
+    fixes = {
+        "high_protine": "high_protein",
+        "protine": "protein",
+    }
+
+    return fixes.get(text, text)
 
 
 class SimilarityQA:
@@ -154,7 +172,8 @@ def main():
             if cmd == "1":
                 try:
                     topic = params[1] if len(params) > 1 else ""
-                    if not topic.strip():
+                    topic = topic.strip()
+                    if not topic:
                         print("Tell me what topic to search on Wikipedia.")
                     else:
                         print(wikipedia.summary(topic, sentences=3, auto_suggest=True))
@@ -175,8 +194,12 @@ def main():
                     print("Please use: I know that X is Y")
                     continue
 
-                entity = params[1].strip().replace(" ", "")
-                prop = params[2].strip()
+                entity = clean_entity(params[1])
+                prop = clean_property(params[2])
+
+                if not entity or not prop:
+                    print("Please use: I know that X is Y")
+                    continue
 
                 new_expr = read_expr(f"{prop}({entity})")
 
@@ -192,8 +215,12 @@ def main():
                     print("Please use: Check that X is Y")
                     continue
 
-                entity = params[1].strip().replace(" ", "")
-                prop = params[2].strip()
+                entity = clean_entity(params[1])
+                prop = clean_property(params[2])
+
+                if not entity or not prop:
+                    print("Please use: Check that X is Y")
+                    continue
 
                 expr = read_expr(f"{prop}({entity})")
                 print(check_fact(kb, expr))
