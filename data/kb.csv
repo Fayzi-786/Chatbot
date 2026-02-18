@@ -10,3 +10,5 @@ high_fiber(x) -> good_for_weight_loss(x)
 high_sugar(x) -> bad_for_weight_loss(x)
 good_for_weight_loss(x) -> healthy_choice(x)
 bad_for_weight_loss(x) -> unhealthy_choice(x)
+bad_for_weight_loss(x) -> -(good_for_weight_loss(x))
+
