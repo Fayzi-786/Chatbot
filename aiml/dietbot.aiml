@@ -3,58 +3,114 @@
 
   <category>
     <pattern>HELLO</pattern>
-    <template>Hi! I am DietBot. Tell me a goal: lose weight, gain muscle, or maintain.</template>
+    <template>
+Hi! I am DietBot.
+Type one of these:
+- high protein foods
+- pre workout
+- post workout
+- image
+- I know that Chicken is high protein
+- Check that Oats is good for weight loss
+    </template>
   </category>
 
   <category>
     <pattern>HI</pattern>
-    <template>Hello! What is the goal today: lose weight, gain muscle, or maintain?</template>
+    <template>
+Hello! What do you want help with today?
+- goal (lose weight / gain muscle / maintain)
+- meals (pre workout / post workout)
+- logic (I know that... / Check that...)
+- image (image)
+    </template>
   </category>
 
   <category>
     <pattern>HELP</pattern>
     <template>
-      I can help with diet advice, high protein foods, and pre or post workout meals.
-      Logic examples:
-      I know that Chicken is high_protein
-      Check that Oats is good_for_weight_loss
-      For images, type: image or classify image
+DietBot can do:
+1) Diet answers (AIML + similarity)
+2) Logic facts:
+   - I know that Chicken is high protein
+   - Check that Oats is good for weight loss
+3) Image classifier:
+   - type: image
+Extra:
+- show image of chicken
+- show image of salmon
     </template>
   </category>
 
   <category>
     <pattern>HIGH PROTEIN FOODS</pattern>
-    <template>High protein foods include chicken, eggs, tuna, Greek yogurt, lentils, and tofu.</template>
+    <template>
+High protein foods:
+- chicken, eggs, tuna
+- Greek yogurt, lentils, tofu
+Question: vegetarian or non veg?
+    </template>
   </category>
 
   <category>
     <pattern>HIGH PROTINE FOODS</pattern>
-    <template>High protein foods include chicken, eggs, tuna, Greek yogurt, lentils, and tofu.</template>
-  </category>
-
-  <category>
-    <pattern>WHAT SHOULD I EAT BEFORE WORKOUT</pattern>
-    <template>Pre workout: carbs plus a little protein, like banana and yogurt, oats, or rice and chicken.</template>
+    <template>
+High protein foods:
+- chicken, eggs, tuna
+- Greek yogurt, lentils, tofu
+Question: vegetarian or non veg?
+    </template>
   </category>
 
   <category>
     <pattern>PRE WORKOUT</pattern>
-    <template>Pre workout: carbs plus a little protein, like banana and yogurt, oats, or rice and chicken.</template>
+    <template>
+Pre workout:
+- carbs + a little protein
+Examples: banana and yogurt, oats, rice and chicken
+Question: training in 30 minutes or 2 hours?
+    </template>
   </category>
 
   <category>
-    <pattern>WHAT SHOULD I EAT AFTER WORKOUT</pattern>
-    <template>Post workout: protein plus carbs, like chicken and rice, tuna sandwich, or whey and banana.</template>
+    <pattern>WHAT SHOULD I EAT BEFORE WORKOUT</pattern>
+    <template>
+Pre workout:
+- carbs + a little protein
+Examples: banana and yogurt, oats, rice and chicken
+Question: training in 30 minutes or 2 hours?
+    </template>
   </category>
 
   <category>
     <pattern>POST WORKOUT</pattern>
-    <template>Post workout: protein plus carbs, like chicken and rice, tuna sandwich, or whey and banana.</template>
+    <template>
+Post workout:
+- protein + carbs
+Examples: chicken and rice, tuna sandwich, whey and banana
+Question: goal is muscle gain or fat loss?
+    </template>
+  </category>
+
+  <category>
+    <pattern>WHAT SHOULD I EAT AFTER WORKOUT</pattern>
+    <template>
+Post workout:
+- protein + carbs
+Examples: chicken and rice, tuna sandwich, whey and banana
+Question: goal is muscle gain or fat loss?
+    </template>
   </category>
 
   <category>
     <pattern>HEALTHY SNACKS</pattern>
-    <template>Healthy snacks: fruit, Greek yogurt, boiled eggs, hummus with carrots.</template>
+    <template>
+Healthy snacks:
+- fruit, Greek yogurt
+- boiled eggs
+- hummus with carrots
+Question: any allergies?
+    </template>
   </category>
 
   <!-- Task B patterns from lab sheet -->
@@ -66,6 +122,12 @@
   <category>
     <pattern>CHECK THAT * IS *</pattern>
     <template>#KBCHECK$<star/>$<star index="2"/></template>
+  </category>
+
+  <!-- Extra: show a sample image for a known food (from sample_images folder) -->
+  <category>
+    <pattern>SHOW IMAGE OF *</pattern>
+    <template>#SHOWIMG$<star/></template>
   </category>
 
   <!-- Task C patterns -->
