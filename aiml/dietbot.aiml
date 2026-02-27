@@ -18,6 +18,7 @@
       Logic examples:
       I know that Chicken is high_protein
       Check that Oats is good_for_weight_loss
+      For images, type: image or classify image
     </template>
   </category>
 
@@ -56,7 +57,7 @@
     <template>Healthy snacks: fruit, Greek yogurt, boiled eggs, hummus with carrots.</template>
   </category>
 
-  <!-- Task B patterns From Lab Sheet -->
+  <!-- Task B patterns from lab sheet -->
   <category>
     <pattern>I KNOW THAT * IS *</pattern>
     <template>#KBADD$<star/>$<star index="2"/></template>
@@ -67,6 +68,28 @@
     <template>#KBCHECK$<star/>$<star index="2"/></template>
   </category>
 
+  <!-- Task C patterns -->
+  <category>
+    <pattern>IMAGE</pattern>
+    <template>#IMG$</template>
+  </category>
+
+  <category>
+    <pattern>CLASSIFY IMAGE</pattern>
+    <template>#IMG$</template>
+  </category>
+
+  <category>
+    <pattern>WHAT IS THIS IMAGE</pattern>
+    <template>#IMG$</template>
+  </category>
+
+  <category>
+    <pattern>WHAT IS IN THIS IMAGE</pattern>
+    <template>#IMG$</template>
+  </category>
+
+  <!-- Exit -->
   <category>
     <pattern>BYE</pattern>
     <template>#0$Bye! Keep training strong.</template>
