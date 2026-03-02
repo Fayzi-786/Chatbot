@@ -12,6 +12,7 @@ Type one of these:
 - image
 - I know that Chicken is high protein
 - Check that Oats is good for weight loss
+- define calorie deficit
     </template>
   </category>
 
@@ -19,10 +20,11 @@ Type one of these:
     <pattern>HI</pattern>
     <template>
 Hello! What do you want help with today?
-- goal (lose weight / gain muscle / maintain)
 - meals (pre workout / post workout)
+- diet tips (high protein foods / healthy snacks)
 - logic (I know that... / Check that...)
 - image (image)
+- definitions (define ... / what is ...)
     </template>
   </category>
 
@@ -39,6 +41,7 @@ DietBot can do:
 Extra:
 - show image of chicken
 - show image of salmon
+- define / what is (Wikipedia)
     </template>
   </category>
 
@@ -167,6 +170,23 @@ Question: any allergies?
     <template>#0$Bye! Keep training strong.</template>
   </category>
 
+  <!-- Task A extra: Wikipedia lookup -->
+  <category>
+    <pattern>DEFINE *</pattern>
+    <template>#1$<star/></template>
+  </category>
+
+  <category>
+    <pattern>WHAT IS *</pattern>
+    <template>#1$<star/></template>
+  </category>
+
+  <category>
+    <pattern>WHO IS *</pattern>
+    <template>#1$<star/></template>
+  </category>
+
+  <!-- Fallback MUST be last -->
   <category>
     <pattern>*</pattern>
     <template>#SIM$</template>
