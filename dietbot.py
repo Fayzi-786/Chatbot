@@ -1,9 +1,13 @@
 ﻿#!/usr/bin/env python3
 import os
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 import re
 import json
+import time
+import warnings
+import logging
+
 import aiml
 import wikipedia
 import pandas as pd
@@ -22,12 +26,22 @@ from sklearn.metrics.pairwise import cosine_similarity
 from nltk.sem import Expression
 from nltk.inference import ResolutionProver
 
+warnings.filterwarnings("ignore", message="No parser was explicitly specified")
+tf.get_logger().setLevel(logging.ERROR)
+try:
+    import absl.logging
+    absl.logging.set_verbosity(absl.logging.ERROR)
+except Exception:
+    pass
 
-# ---------- clean printing ----------
+
 def say(text: str):
-    print(str(text).strip())
+    if text is None:
+        return
+    print(str(text).strip("\n"))
 
 
+# ---------- Diet Bot Menu ----------
 def menu_text(code: str) -> str:
     code = (code or "").upper().strip()
 
@@ -39,22 +53,32 @@ def menu_text(code: str) -> str:
             "3) logic\n"
             "4) image\n"
             "5) define <topic>\n"
+            "6) rate meal protein=40 sugar=5 fiber=8\n"
             "\n"
             "Example: diet"
         )
 
     if code == "HELP":
         return (
-            "DietBot features:\n"
-            "- Task A: AIML + similarity (TF-IDF + cosine)\n"
-            "- Task B: logic KB (I know that... / Check that...)\n"
-            "- Task C: image classifier (type: image)\n"
+            "You can ask me about:\n"
+            "- lose weight / gain muscle / maintenance\n"
+            "- high protein foods / healthy snacks\n"
+            "- pre workout / post workout\n"
             "\n"
-            "Extras:\n"
-            "- Wikipedia: define / what is / who is\n"
-            "- show image of <thing>\n"
+            "Logic:\n"
+            "- I know that Chicken is high protein\n"
+            "- Check that Oats is good for weight loss\n"
+            "- Check if chicken is high protein\n"
             "\n"
-            "Type: diet, meals, logic, image"
+            "Images:\n"
+            "- image (baseline CNN)\n"
+            "- image tl (MobileNetV2 transfer learning)\n"
+            "\n"
+            "Extra (Task B):\n"
+            "- rate meal protein=40 sugar=5 fiber=8\n"
+            "\n"
+            "Extra (Task A):\n"
+            "- define calorie deficit"
         )
 
     if code == "DIET":
@@ -69,15 +93,6 @@ def menu_text(code: str) -> str:
             "Example: lose weight"
         )
 
-    if code == "DIET_TIPS":
-        return (
-            "Diet tips:\n"
-            "- high protein foods\n"
-            "- healthy snacks\n"
-            "\n"
-            "Example: high protein foods"
-        )
-
     if code == "MEALS":
         return (
             "Meals:\n"
@@ -90,10 +105,15 @@ def menu_text(code: str) -> str:
     if code == "LOGIC":
         return (
             "Logic examples:\n"
-            "- I know that Chicken is high protein\n"
-            "- Check that Oats is good for weight loss\n"
+            "> I know that Chicken is high protein\n"
+            "OK, I will remember that Chicken is high_protein.\n"
             "\n"
-            "Tip: spelling can be a bit flexible (is / ia / =)."
+            "> Check that Oats is good for weight loss\n"
+            "It may not be true... let me check...\n"
+            "Correct\n"
+            "\n"
+            "You can also write:\n"
+            "- Check if chicken is high protein"
         )
 
     if code == "LOSE":
@@ -101,9 +121,7 @@ def menu_text(code: str) -> str:
             "Weight loss basics:\n"
             "- small calorie deficit\n"
             "- high protein + high fiber\n"
-            "- strength training + steps\n"
-            "\n"
-            "Try: healthy snacks"
+            "- strength training + steps"
         )
 
     if code == "GAIN":
@@ -111,9 +129,7 @@ def menu_text(code: str) -> str:
             "Muscle gain basics:\n"
             "- small calorie surplus\n"
             "- enough protein daily\n"
-            "- progressive overload training\n"
-            "\n"
-            "Try: high protein foods"
+            "- progressive overload training"
         )
 
     if code == "MAINT":
@@ -121,15 +137,14 @@ def menu_text(code: str) -> str:
             "Maintenance basics:\n"
             "- eat around maintenance calories\n"
             "- keep protein consistent\n"
-            "- keep activity stable\n"
+            "- keep activity stable"
         )
 
     if code == "PROTEIN":
         return (
-            "High protein foods:\n"
+            "High protein foods include:\n"
             "- chicken, eggs, tuna\n"
             "- Greek yogurt, lentils, tofu\n"
-            "\n"
             "Question: vegetarian or non veg?"
         )
 
@@ -138,27 +153,21 @@ def menu_text(code: str) -> str:
             "Healthy snacks:\n"
             "- fruit, Greek yogurt\n"
             "- boiled eggs\n"
-            "- hummus with carrots\n"
-            "\n"
-            "Question: any allergies?"
+            "- hummus with carrots"
         )
 
     if code == "PRE":
         return (
             "Pre workout:\n"
             "- carbs + a little protein\n"
-            "- banana and yogurt, oats, rice and chicken\n"
-            "\n"
-            "Question: training in 30 minutes or 2 hours?"
+            "Examples: banana and yogurt, oats, rice and chicken"
         )
 
     if code == "POST":
         return (
             "Post workout:\n"
             "- protein + carbs\n"
-            "- chicken and rice, tuna sandwich, whey and banana\n"
-            "\n"
-            "Question: goal is muscle gain or fat loss?"
+            "Examples: chicken and rice, tuna sandwich, whey and banana"
         )
 
     return "Type: help"
@@ -217,7 +226,7 @@ class SimilarityQA:
         return self.answers[best_idx]
 
 
-# ---------- Task B cleaning ----------
+# ---------- Task B logic ----------
 def clean_entity(text: str) -> str:
     text = text.strip()
     text = re.sub(r"\s+", "", text).replace("_", "")
@@ -231,9 +240,12 @@ def clean_property(text: str) -> str:
     text = text.replace("-", " ")
     text = re.sub(r"\s+", "_", text)
     text = re.sub(r"_+", "_", text)
-
     fixes = {"high_protine": "high_protein", "protine": "protein", "protin": "protein", "suger": "sugar"}
     return fixes.get(text, text)
+
+
+def strip_leading_the(text: str) -> str:
+    return re.sub(r"^(the)\s+", "", text.strip(), flags=re.IGNORECASE)
 
 
 def load_kb(kb_path: str):
@@ -265,21 +277,109 @@ def check_fact(kb, expr):
     neg = read_expr(f"-({expr})")
     if ResolutionProver().prove(neg, kb):
         return "Incorrect"
-    return "Sorry, I don't know"
+    return "Sorry I don't know."
 
 
 def parse_know_like(text: str):
     m = re.match(r"^\s*i\s+know\s+that\s+(.+?)\s+(is|ia|iz|=)\s+(.+)\s*$", text, re.IGNORECASE)
     if not m:
         return None
-    return clean_entity(m.group(1)), clean_property(m.group(3))
+    entity_raw = strip_leading_the(m.group(1))
+    return clean_entity(entity_raw), clean_property(m.group(3))
 
 
 def parse_check_like(text: str):
     m = re.match(r"^\s*check\s+that\s+(.+?)\s+(is|ia|iz|=)\s+(.+)\s*$", text, re.IGNORECASE)
     if not m:
         return None
-    return clean_entity(m.group(1)), clean_property(m.group(3))
+    entity_raw = strip_leading_the(m.group(1))
+    return clean_entity(entity_raw), clean_property(m.group(3))
+
+
+def parse_checkif_payload(payload: str):
+    payload = payload.strip()
+    payload = re.sub(r"^(the)\s+", "", payload, flags=re.IGNORECASE)
+    m = re.match(r"^(.+?)\s+(is|ia|iz|=)\s+(.+)$", payload, flags=re.IGNORECASE)
+    if not m:
+        return None
+    entity = clean_entity(m.group(1))
+    prop = clean_property(m.group(3))
+    return entity, prop
+
+
+# ---------- Task B EXTRA: fuzzy meal score ----------
+def tri(x, a, b, c):
+    if x <= a or x >= c:
+        return 0.0
+    if x == b:
+        return 1.0
+    if x < b:
+        return (x - a) / (b - a + 1e-9)
+    return (c - x) / (c - b + 1e-9)
+
+
+def fuzzy_meal_score(protein_g: float, sugar_g: float, fiber_g: float):
+    p_low = tri(protein_g, 0, 0, 20)
+    p_med = tri(protein_g, 15, 30, 45)
+    p_high = tri(protein_g, 35, 60, 60)
+
+    s_low = tri(sugar_g, 0, 0, 10)
+    s_med = tri(sugar_g, 8, 20, 35)
+    s_high = tri(sugar_g, 30, 60, 60)
+
+    f_low = tri(fiber_g, 0, 0, 3)
+    f_med = tri(fiber_g, 2, 6, 10)
+    f_high = tri(fiber_g, 8, 20, 20)
+
+    healthy = max(min(p_high, s_low, f_high), min(p_high, s_low, f_med))
+    okay = max(min(p_med, s_low, f_med), min(p_med, s_med, f_med))
+    unhealthy = max(s_high, min(p_low, f_low), min(s_med, p_low))
+
+    denom = healthy + okay + unhealthy + 1e-9
+    score = (healthy * 0.85 + okay * 0.55 + unhealthy * 0.20) / denom
+
+    if score >= 0.70:
+        label = "Healthy"
+    elif score >= 0.40:
+        label = "Okay"
+    else:
+        label = "Unhealthy"
+
+    details = {
+        "protein": {"low": p_low, "med": p_med, "high": p_high},
+        "sugar": {"low": s_low, "med": s_med, "high": s_high},
+        "fiber": {"low": f_low, "med": f_med, "high": f_high},
+        "rules": {"healthy": healthy, "okay": okay, "unhealthy": unhealthy},
+    }
+    return label, score, details
+
+
+def parse_rate_meal(payload: str):
+    # supports:
+    # protein=40 sugar=5 fiber=8
+    # protein:40 sugar:5 fiber:8
+    # or: 40 5 8
+    payload = payload.strip().lower()
+
+    nums = re.findall(r"[-+]?\d*\.?\d+", payload)
+    has_keys = ("protein" in payload) or ("sugar" in payload) or ("fiber" in payload)
+
+    if has_keys:
+        def get_val(key):
+            m = re.search(rf"{key}\s*[:=]\s*([-+]?\d*\.?\d+)", payload)
+            return float(m.group(1)) if m else None
+
+        p = get_val("protein")
+        s = get_val("sugar")
+        f = get_val("fiber")
+        if p is None or s is None or f is None:
+            return None
+        return p, s, f
+
+    if len(nums) >= 3:
+        return float(nums[0]), float(nums[1]), float(nums[2])
+
+    return None
 
 
 # ---------- Task C ----------
@@ -287,24 +387,16 @@ def pick_image_file():
     root = Tk()
     root.withdraw()
     root.attributes("-topmost", True)
-    path = askopenfilename(title="Select an image", filetypes=[("Image files", "*.jpg *.jpeg *.png *.bmp")])
+    path = askopenfilename(title="Select image", filetypes=[("Image files", "*.jpg *.jpeg *.png *.bmp *.png")])
     root.destroy()
     return path
 
 
-def predict_image(model, labels, image_path, img_size=(100, 100)):
+def predict_probs(model, image_path, img_size):
     img = tf.keras.utils.load_img(image_path, target_size=img_size)
     arr = tf.keras.utils.img_to_array(img)
-    arr = tf.expand_dims(arr, 0) / 255.0
-
-    probs = model.predict(arr, verbose=0)[0]
-    top_idx = int(np.argmax(probs))
-    top_label = labels[top_idx]
-    top_conf = float(probs[top_idx])
-
-    top3_idx = np.argsort(probs)[::-1][:3]
-    top3 = [(labels[i], float(probs[i])) for i in top3_idx]
-    return top_label, top_conf, top3
+    arr = tf.expand_dims(arr, 0)  # no /255 (models include scaling)
+    return model.predict(arr, verbose=0)[0]
 
 
 def keyify(text: str) -> str:
@@ -329,33 +421,32 @@ def open_image_file(path: str):
         pass
 
 
-# ---------- Wikipedia fix ----------
+WIKI_ALIASES = {
+    "ai": "Artificial intelligence",
+    "ml": "Machine learning",
+    "cpu": "Central processing unit",
+    "gpu": "Graphics processing unit",
+}
+
+
 def wiki_summary_safe(query: str) -> str:
     query = (query or "").strip()
     if not query:
-        return "Tell me what topic to search on Wikipedia."
+        return "Sorry, I do not know that. Be more specific!"
 
-    # Try normal summary
+    key = query.lower().strip()
+    if key in WIKI_ALIASES:
+        query = WIKI_ALIASES[key]
+
     try:
         return wikipedia.summary(query, sentences=3, auto_suggest=True, redirect=True)
     except Exception:
         pass
 
-    # Try search-based fallback
     try:
         results = wikipedia.search(query, results=5)
         if results:
             return wikipedia.summary(results[0], sentences=3, auto_suggest=False, redirect=True)
-    except Exception:
-        pass
-
-    # Try removing leading articles (a/an/the)
-    try:
-        cleaned = re.sub(r"^(a|an|the)\s+", "", query.lower()).strip()
-        if cleaned and cleaned != query.lower():
-            results = wikipedia.search(cleaned, results=5)
-            if results:
-                return wikipedia.summary(results[0], sentences=3, auto_suggest=False, redirect=True)
     except Exception:
         pass
 
@@ -372,10 +463,19 @@ def main():
 
     model_path = os.path.join(base_dir, "models", "fruit_model.h5")
     labels_path = os.path.join(base_dir, "models", "labels.json")
+
+    tl_model_path = os.path.join(base_dir, "models", "fruit_mobilenet.h5")
+    tl_labels_path = os.path.join(base_dir, "models", "labels_mobilenet.json")
+
     sample_dir = os.path.join(base_dir, "sample_images")
 
+    say("============= RESTART: dietbot.py =============")
+
     kern = aiml.Kernel()
+    t0 = time.perf_counter()
     kern.learn(aiml_path)
+    t1 = time.perf_counter()
+    say(f"Kernel bootstrap completed in {t1 - t0:.2f} seconds")
 
     sim_qa = SimilarityQA(csv_path)
 
@@ -386,11 +486,20 @@ def main():
         say(f"Problem statement: {bad_expr}")
         return
 
+    # baseline model
     fruit_model = tf.keras.models.load_model(model_path)
     with open(labels_path, "r", encoding="utf-8") as f:
         fruit_labels = json.load(f)
 
-    say("Welcome to DietBot. Type 'help' for options. Type 'bye' to exit.")
+    # transfer model (optional)
+    tl_model = None
+    tl_labels = None
+    if os.path.exists(tl_model_path) and os.path.exists(tl_labels_path):
+        tl_model = tf.keras.models.load_model(tl_model_path)
+        with open(tl_labels_path, "r", encoding="utf-8") as f:
+            tl_labels = json.load(f)
+
+    say("Welcome to DietBot.\nType 'help' to see examples.\nType 'bye' to exit.")
 
     while True:
         try:
@@ -402,22 +511,23 @@ def main():
         if not user_input:
             continue
 
-        # Logic: accept ia / is / =
+        # Task B logic (official patterns)
         know = parse_know_like(user_input)
         if know:
             entity, prop = know
             new_expr = read_expr(f"{prop}({entity})")
             if kb_contradicts(kb, new_expr):
-                say("I cannot add that because it contradicts what I already know.")
+                say("Sorry this contradicts with what I know!")
             else:
                 kb.append(new_expr)
-                say(f"OK, I'll remember that {entity} is {prop}.")
+                say(f"OK, I will remember that {entity} is {prop}.")
             continue
 
         chk = parse_check_like(user_input)
         if chk:
             entity, prop = chk
             expr = read_expr(f"{prop}({entity})")
+            say("It may not be true... let me check...")
             say(check_fact(kb, expr))
             continue
 
@@ -443,44 +553,95 @@ def main():
 
             if cmd == "SIM":
                 best = sim_qa.answer(user_input, threshold=0.32)
-                if best:
-                    say(best)
-                else:
-                    say("I’m not sure. Type: help")
+                say(best if best else "I did not get that, please try again.")
                 continue
 
             if cmd == "SHOWIMG":
                 term = params[1].strip() if len(params) > 1 else ""
                 sample_path = find_sample_image(term, sample_dir)
                 if sample_path:
-                    say(f"Opening sample image for: {term}")
+                    say(f"Opening image for: {term}")
                     open_image_file(sample_path)
                 else:
-                    say("No matching image found in sample_images.")
+                    say("Sorry, I cannot find that image in sample_images.")
+                continue
+
+            if cmd == "CHECKIF":
+                payload = params[1].strip() if len(params) > 1 else ""
+                parsed = parse_checkif_payload(payload)
+                if not parsed:
+                    say("Please use: check if X is Y")
+                    continue
+                entity, prop = parsed
+                expr = read_expr(f"{prop}({entity})")
+                say("It may not be true... let me check...")
+                say(check_fact(kb, expr))
+                continue
+
+            if cmd == "FUZZY":
+                payload = params[1].strip() if len(params) > 1 else ""
+                parsed = parse_rate_meal(payload)
+                if not parsed:
+                    say("Please use:\nrate meal protein=40 sugar=5 fiber=8\nor: rate meal 40 5 8")
+                    continue
+                p, s, f = parsed
+                label, score, details = fuzzy_meal_score(p, s, f)
+                say(f"Meal score: {label} ({score:.2f})")
+                say(f"- protein={p}g, sugar={s}g, fiber={f}g")
+                say("Tip: high protein + low sugar + good fiber usually improves meal quality.")
                 continue
 
             if cmd == "IMG":
-                say("Select an image file now...")
+                say("Select image file (a dialog will open)...")
                 img_path = pick_image_file()
                 if not img_path:
                     say("No image selected.")
                     continue
+                say(f"Selected file: {os.path.basename(img_path)}")
 
-                label, conf, top3 = predict_image(fruit_model, fruit_labels, img_path, img_size=(100, 100))
+                probs = predict_probs(fruit_model, img_path, img_size=(100, 100))
+                top_idx = int(np.argmax(probs))
+                label = fruit_labels[top_idx]
+
                 say(f"The image contains: {label}")
-                for name, p in top3:
-                    say(f"- {name}: {p*100:.2f}%")
-                if conf < 0.60 and len(top3) >= 2:
-                    say(f"Sorry, I am not confident. It might be {top3[0][0]} or {top3[1][0]}.")
+                for i, name in enumerate(fruit_labels):
+                    say(f"{name}: {probs[i]*100:.2f}%")
+                say("Note: this model only knows these classes:")
+                say(", ".join(fruit_labels))
                 continue
 
-            say("Type: help")
+            if cmd == "IMGTL":
+                if tl_model is None or tl_labels is None:
+                    say("Transfer model not found. Run: python training/train_fruit_mobilenet.py")
+                    continue
+
+                say("Select image file (a dialog will open)...")
+                img_path = pick_image_file()
+                if not img_path:
+                    say("No image selected.")
+                    continue
+                say(f"Selected file: {os.path.basename(img_path)}")
+
+                probs = predict_probs(tl_model, img_path, img_size=(160, 160))
+                top_idx = int(np.argmax(probs))
+                label = tl_labels[top_idx]
+
+                say(f"The image contains (MobileNetV2): {label}")
+                for i, name in enumerate(tl_labels):
+                    say(f"{name}: {probs[i]*100:.2f}%")
+                say("Note: this model only knows these classes:")
+                say(", ".join(tl_labels))
+                continue
+
+            say("I did not get that, please try again.")
             continue
 
+        # normal AIML text reply
         if answer.strip():
             say(answer)
         else:
-            say("Type: help")
+            best = sim_qa.answer(user_input, threshold=0.32)
+            say(best if best else "I did not get that, please try again.")
 
 
 if __name__ == "__main__":
