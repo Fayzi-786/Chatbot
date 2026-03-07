@@ -1,188 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <aiml version="1.0.1">
 
-  <!-- Menus (printed by Python) -->
-  <category>
-    <pattern>HELLO</pattern>
-    <template>#MENU$HOME</template>
-  </category>
+  <!-- greet -->
+  <category><pattern>HI</pattern><template>Hello! How are you?</template></category>
+  <category><pattern>HELLO</pattern><template>Hello! How are you?</template></category>
+  <category><pattern>HOW ARE YOU</pattern><template>I'm functioning within normal parameters, thanks for asking.</template></category>
 
-  <category>
-    <pattern>HI</pattern>
-    <template>#MENU$HOME</template>
-  </category>
+  <category><pattern>I AM GOOD</pattern><template>That's good to know. What would you like to discuss about nutrition?</template></category>
+  <category><pattern>I AM GREAT</pattern><template>That's good to know. What would you like to discuss about nutrition?</template></category>
+  <category><pattern>I AM FINE</pattern><template>That's good to know. What would you like to discuss about nutrition?</template></category>
+  <category><pattern>IM GOOD</pattern><template>That's good to know. What would you like to discuss about nutrition?</template></category>
+  <category><pattern>IM FINE</pattern><template>That's good to know. What would you like to discuss about nutrition?</template></category>
 
-  <category>
-    <pattern>HELP</pattern>
-    <template>#MENU$HELP</template>
-  </category>
+  <!-- menus -->
+  <category><pattern>HELP</pattern><template>#MENU$HELP</template></category>
+  <category><pattern>MENU</pattern><template>#MENU$HOME</template></category>
+  <category><pattern>DIET</pattern><template>#MENU$DIET</template></category>
+  <category><pattern>MEALS</pattern><template>#MENU$MEALS</template></category>
+  <category><pattern>LOGIC</pattern><template>#MENU$LOGIC</template></category>
 
-  <category>
-    <pattern>DIET</pattern>
-    <template>#MENU$DIET</template>
-  </category>
+  <!-- goals -->
+  <category><pattern>LOSE WEIGHT</pattern><template>#MENU$LOSE</template></category>
+  <category><pattern>LOSS WEIGHT</pattern><template>#MENU$LOSE</template></category>
+  <category><pattern>GAIN MUSCLE</pattern><template>#MENU$GAIN</template></category>
+  <category><pattern>GAIN WEIGHT</pattern><template>#MENU$GAIN</template></category>
+  <category><pattern>GAIN WEUGHT</pattern><template>#MENU$GAIN</template></category>
 
-  <category>
-    <pattern>DIET TIPS</pattern>
-    <template>#MENU$DIET_TIPS</template>
-  </category>
+  <category><pattern>MAINTENANCE</pattern><template>#MENU$MAINT</template></category>
+  <category><pattern>MAINTAINENCE</pattern><template>#MENU$MAINT</template></category>
+  <category><pattern>MAINTENNANCE</pattern><template>#MENU$MAINT</template></category>
 
-  <category>
-    <pattern>MEALS</pattern>
-    <template>#MENU$MEALS</template>
-  </category>
+  <!-- foods -->
+  <category><pattern>HIGH PROTEIN FOODS</pattern><template>#MENU$PROTEIN</template></category>
+  <category><pattern>HEALTHY SNACKS</pattern><template>#MENU$SNACKS</template></category>
 
-  <category>
-    <pattern>LOGIC</pattern>
-    <template>#MENU$LOGIC</template>
-  </category>
+  <!-- meals -->
+  <category><pattern>PRE WORKOUT</pattern><template>#MENU$PRE</template></category>
+  <category><pattern>POST WORKOUT</pattern><template>#MENU$POST</template></category>
 
-  <!-- Goals -->
-  <category>
-    <pattern>LOSE WEIGHT</pattern>
-    <template>#MENU$LOSE</template>
-  </category>
+  <!-- single word shortcuts -->
+  <category><pattern>CHICKEN</pattern><template>Chicken is a high-protein food. Try: Check that Chicken is high_protein</template></category>
+  <category><pattern>TUNA</pattern><template>Tuna is a high-protein food. Try: Check that Tuna is high_protein</template></category>
+  <category><pattern>FISH</pattern><template>Fish is usually high in protein. Try: high protein foods</template></category>
 
-  <category>
-    <pattern>LOSS WEIGHT</pattern>
-    <template>#MENU$LOSE</template>
-  </category>
+  <!-- Task B required patterns -->
+  <category><pattern>I KNOW THAT * IS *</pattern><template>#KBADD$<star/>$<star index="2"/></template></category>
+  <category><pattern>CHECK THAT * IS *</pattern><template>#KBCHECK$<star/>$<star index="2"/></template></category>
 
-  <category>
-    <pattern>WEIGHT LOSS</pattern>
-    <template>#MENU$LOSE</template>
-  </category>
+  <!-- usability: check if ... -->
+  <category><pattern>CHECK IF *</pattern><template>#CHECKIF$<star/></template></category>
+  <category><pattern>CHECK IF THE *</pattern><template>#CHECKIF$<star/></template></category>
 
-  <category>
-    <pattern>GAIN MUSCLE</pattern>
-    <template>#MENU$GAIN</template>
-  </category>
+  <!-- Task B extra: fuzzy score -->
+  <category><pattern>RATE MEAL *</pattern><template>#FUZZY$<star/></template></category>
+  <category><pattern>MEAL SCORE *</pattern><template>#FUZZY$<star/></template></category>
 
-  <category>
-    <pattern>GAIN WEIGHT</pattern>
-    <template>#MENU$GAIN</template>
-  </category>
+  <!-- Task C -->
+  <category><pattern>IMAGE</pattern><template>#IMG$</template></category>
+  <category><pattern>IMAGE TL</pattern><template>#IMGTL$</template></category>
+  <category><pattern>IMAGE MOBILENET</pattern><template>#IMGTL$</template></category>
+  <category><pattern>IMAGE TRANSFER</pattern><template>#IMGTL$</template></category>
 
-  <category>
-    <pattern>MAINTENANCE</pattern>
-    <template>#MENU$MAINT</template>
-  </category>
+  <category><pattern>WHAT IS THIS IMAGE</pattern><template>#IMG$</template></category>
+  <category><pattern>WHAT IS IN THIS IMAGE</pattern><template>#IMG$</template></category>
 
-  <category>
-    <pattern>MAINTAENANCE</pattern>
-    <template>#MENU$MAINT</template>
-  </category>
+  <!-- extras -->
+  <category><pattern>SHOW IMAGE OF *</pattern><template>#SHOWIMG$<star/></template></category>
+  <category><pattern>DEFINE *</pattern><template>#1$<star/></template></category>
+  <category><pattern>WHAT IS *</pattern><template>#1$<star/></template></category>
+  <category><pattern>WHO IS *</pattern><template>#1$<star/></template></category>
 
-  <!-- Diet items -->
-  <category>
-    <pattern>HIGH PROTEIN FOODS</pattern>
-    <template>#MENU$PROTEIN</template>
-  </category>
+  <!-- exit -->
+  <category><pattern>BYE</pattern><template>#0$Bye! Nice talking to you. You take care now.</template></category>
+  <category><pattern>EXIT</pattern><template>#0$Bye! Nice talking to you. You take care now.</template></category>
+  <category><pattern>QUIT</pattern><template>#0$Bye! Nice talking to you. You take care now.</template></category>
 
-  <category>
-    <pattern>HIGH PROTINE FOODS</pattern>
-    <template>#MENU$PROTEIN</template>
-  </category>
-
-  <category>
-    <pattern>HEALTHY SNACKS</pattern>
-    <template>#MENU$SNACKS</template>
-  </category>
-
-  <category>
-    <pattern>PRE WORKOUT</pattern>
-    <template>#MENU$PRE</template>
-  </category>
-
-  <category>
-    <pattern>POST WORKOUT</pattern>
-    <template>#MENU$POST</template>
-  </category>
-
-  <category>
-    <pattern>WHAT SHOULD I EAT BEFORE WORKOUT</pattern>
-    <template>#MENU$PRE</template>
-  </category>
-
-  <category>
-    <pattern>WHAT SHOULD I EAT AFTER WORKOUT</pattern>
-    <template>#MENU$POST</template>
-  </category>
-
-  <!-- Task B (required patterns) -->
-  <category>
-    <pattern>I KNOW THAT * IS *</pattern>
-    <template>#KBADD$<star/>$<star index="2"/></template>
-  </category>
-
-  <category>
-    <pattern>CHECK THAT * IS *</pattern>
-    <template>#KBCHECK$<star/>$<star index="2"/></template>
-  </category>
-
-  <!-- Extra: show a sample image for a known food -->
-  <category>
-    <pattern>SHOW IMAGE OF *</pattern>
-    <template>#SHOWIMG$<star/></template>
-  </category>
-
-  <!-- Task C patterns -->
-  <category>
-    <pattern>IMAGE</pattern>
-    <template>#IMG$</template>
-  </category>
-
-  <category>
-    <pattern>CLASSIFY IMAGE</pattern>
-    <template>#IMG$</template>
-  </category>
-
-  <category>
-    <pattern>WHAT IS THIS IMAGE</pattern>
-    <template>#IMG$</template>
-  </category>
-
-  <category>
-    <pattern>WHAT IS IN THIS IMAGE</pattern>
-    <template>#IMG$</template>
-  </category>
-
-  <!-- Task A extra: Wikipedia -->
-  <category>
-    <pattern>DEFINE *</pattern>
-    <template>#1$<star/></template>
-  </category>
-
-  <category>
-    <pattern>WHAT IS *</pattern>
-    <template>#1$<star/></template>
-  </category>
-
-  <category>
-    <pattern>WHO IS *</pattern>
-    <template>#1$<star/></template>
-  </category>
-
-  <!-- Exit -->
-  <category>
-    <pattern>BYE</pattern>
-    <template>#0$Bye! Keep training strong.</template>
-  </category>
-
-  <category>
-    <pattern>EXIT</pattern>
-    <template>#0$Bye! Keep training strong.</template>
-  </category>
-
-  <category>
-    <pattern>QUIT</pattern>
-    <template>#0$Bye! Keep training strong.</template>
-  </category>
-
-  <!-- Fallback MUST be last -->
-  <category>
-    <pattern>*</pattern>
-    <template>#SIM$</template>
-  </category>
+  <!-- fallback last -->
+  <category><pattern>*</pattern><template>#SIM$</template></category>
 
 </aiml>
