@@ -4,6 +4,7 @@
   <!-- greet -->
   <category><pattern>HI</pattern><template>Hello! How are you?</template></category>
   <category><pattern>HELLO</pattern><template>Hello! How are you?</template></category>
+  <category><pattern>HEY</pattern><template>Hello! How are you?</template></category>
   <category><pattern>HOW ARE YOU</pattern><template>I'm functioning within normal parameters, thanks for asking.</template></category>
 
   <category><pattern>I AM GOOD</pattern><template>That's good to know. What would you like to discuss about nutrition?</template></category>
@@ -15,6 +16,8 @@
   <!-- menus -->
   <category><pattern>HELP</pattern><template>#MENU$HELP</template></category>
   <category><pattern>MENU</pattern><template>#MENU$HOME</template></category>
+  <category><pattern>MENUE</pattern><template>#MENU$HOME</template></category>
+
   <category><pattern>DIET</pattern><template>#MENU$DIET</template></category>
   <category><pattern>MEALS</pattern><template>#MENU$MEALS</template></category>
   <category><pattern>LOGIC</pattern><template>#MENU$LOGIC</template></category>
@@ -22,6 +25,8 @@
   <!-- goals -->
   <category><pattern>LOSE WEIGHT</pattern><template>#MENU$LOSE</template></category>
   <category><pattern>LOSS WEIGHT</pattern><template>#MENU$LOSE</template></category>
+  <category><pattern>WEIGHT LOSS</pattern><template>#MENU$LOSE</template></category>
+
   <category><pattern>GAIN MUSCLE</pattern><template>#MENU$GAIN</template></category>
   <category><pattern>GAIN WEIGHT</pattern><template>#MENU$GAIN</template></category>
   <category><pattern>GAIN WEUGHT</pattern><template>#MENU$GAIN</template></category>
@@ -60,15 +65,14 @@
   <category><pattern>IMAGE TL</pattern><template>#IMGTL$</template></category>
   <category><pattern>IMAGE MOBILENET</pattern><template>#IMGTL$</template></category>
   <category><pattern>IMAGE TRANSFER</pattern><template>#IMGTL$</template></category>
-
   <category><pattern>WHAT IS THIS IMAGE</pattern><template>#IMG$</template></category>
   <category><pattern>WHAT IS IN THIS IMAGE</pattern><template>#IMG$</template></category>
 
   <!-- extras -->
   <category><pattern>SHOW IMAGE OF *</pattern><template>#SHOWIMG$<star/></template></category>
-  <category><pattern>DEFINE *</pattern><template>#1$<star/></template></category>
-  <category><pattern>WHAT IS *</pattern><template>#1$<star/></template></category>
-  <category><pattern>WHO IS *</pattern><template>#1$<star/></template></category>
+  <category><pattern>DEFINE *</pattern><template>#WIKI$<star/></template></category>
+  <category><pattern>WHAT IS *</pattern><template>#WIKI$<star/></template></category>
+  <category><pattern>WHO IS *</pattern><template>#WIKI$<star/></template></category>
 
   <!-- exit -->
   <category><pattern>BYE</pattern><template>#0$Bye! Nice talking to you. You take care now.</template></category>
